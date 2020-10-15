@@ -3,7 +3,7 @@
 
 matrix *create_matrix(){
     matrix *m = (matrix *)malloc(sizeof(matrix));
-    init_matrix(m);
+    init_matrix(m, 0, 0);
     while(m->num_rows == 0){
         printf("Enter number of rows: ");
         m->num_rows = input_int();
@@ -45,10 +45,10 @@ bool allocate_matrix(matrix *matr){
     return true;
 
 }
-bool init_matrix(matrix *matr){
+bool init_matrix(matrix *matr, size_t num_rows, size_t num_cols){
     matr->matrix = NULL;
-    matr->num_rows = 0;
-    matr->num_cols = 0;
+    matr->num_rows = num_rows;
+    matr->num_cols = num_cols;
 }
 void free_matrix(matrix *matr){
     if(matr == NULL){

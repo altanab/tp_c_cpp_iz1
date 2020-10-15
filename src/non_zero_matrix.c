@@ -9,6 +9,7 @@ non_zero_matrix *init_non_zero_matrix(size_t num_vectors){
         printf("Cannot allocate memory\n");
         return NULL;
     }
+    non_zero_m->matrix = NULL;
     non_zero_m->num_vectors = 0;
     if(!change_size_non_zero_matrix(non_zero_m, num_vectors)){
         free(non_zero_m);
@@ -74,6 +75,9 @@ void print_non_zero_matrix(non_zero_matrix *non_zero_m){
 }
 
 non_zero_matrix *delete_zeros(int **input_matrix, size_t num_rows, size_t num_cols){
+    if(input_matrix == NULL){
+        return NULL;
+    }
     non_zero_matrix *non_zero_m = init_non_zero_matrix(num_rows);
     if(non_zero_m == NULL){
         return NULL;

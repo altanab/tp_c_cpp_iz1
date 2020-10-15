@@ -2,11 +2,13 @@
 
 extern "C" {
 #include "non_zero_matrix.h"
+#include "matrix.h"
 }
 
+const size_t num_rows = 4;
+const size_t num_cols = 4;
+
 TEST(test, TestIsEqual){
-    size_t num_rows = 4;
-    size_t num_cols = 4;
     int input_matrix_1[num_rows][num_cols] = {
             {1, 2, 3, 0},
             {34, -5, 6, 0},
@@ -74,8 +76,6 @@ TEST(test, TestIsEqual){
 }
 
 TEST(test, SimpleTest){
-    size_t num_rows = 4;
-    size_t num_cols = 4;
     int input_matrix[num_rows][num_cols] = {
             {1, 2, 0, 3},
             {34, -5, 6, 0},
@@ -89,13 +89,16 @@ TEST(test, SimpleTest){
             {23, 56, 12, 5, 0},
             {12, 45, 0, 0, 0}
     };
-    int **test_matrix = (int **)malloc(num_rows * sizeof(int *));
+
+    matrix *test_matrix = (matrix *)malloc(sizeof(matrix));
+    EXPECT_TRUE(init_matrix(test_matrix, num_rows, num_cols));
+    EXPECT_TRUE(allocate_matrix(test_matrix));
     for(size_t i = 0; i < num_rows; ++i){
-        test_matrix[i] = (int *)malloc(num_cols * sizeof(int));
         for(size_t j = 0; j < num_cols; ++j){
-            test_matrix[i][j] = input_matrix[i][j];
+            test_matrix->matrix[i][j] = input_matrix[i][j];
         }
     }
+
     int **expected_matrix = (int **)malloc(num_rows * sizeof(int *));
     for(size_t i = 0; i < num_rows; ++i){
         size_t j = 0;
@@ -107,182 +110,182 @@ TEST(test, SimpleTest){
             expected_matrix[i][k] = expected_input_matrix[i][k];
         }
     }
+
     non_zero_matrix *expected_struct = (non_zero_matrix *)malloc(sizeof(non_zero_matrix));
     expected_struct->matrix = expected_matrix;
     expected_struct->num_vectors = num_rows;
 
-    non_zero_matrix *result_struct = delete_zeros(test_matrix, num_rows, num_cols);
+    non_zero_matrix *result_struct = delete_zeros(test_matrix->matrix, test_matrix->num_rows, test_matrix->num_cols);
 
-    EXPECT_TRUE(is_equal(result_struct, expected_struct));
+    EXPECT_TRUE(is_equal(expected_struct, result_struct));
 
-    for(size_t i = 0; i < num_rows; ++i){
-        free(test_matrix[i]);
-    }
-    free(test_matrix);
     free_non_zero_matrix(expected_struct);
     free_non_zero_matrix(result_struct);
+    free_matrix(test_matrix);
+}
+
+TEST(test, EmptyInputTest){
+    int **test_matrix = NULL;
+
+    non_zero_matrix *result_struct = delete_zeros(test_matrix, num_rows, num_cols);
+
+    EXPECT_EQ(NULL, result_struct);
 }
 
 TEST(test, AllZeroTest){
-    size_t num_rows = 4;
-    size_t num_cols = 4;
     int input_matrix[num_rows][num_cols] = {
             {0, 0, 0, 0},
             {0, 0, 0, 0},
             {0, 0, 0, 0},
             {0, 0, 0, 0}
     };
-    int **test_matrix = (int **)malloc(num_rows * sizeof(int *));
+
+    matrix *test_matrix = (matrix *)malloc(sizeof(matrix));
+    EXPECT_TRUE(init_matrix(test_matrix, num_rows, num_cols));
+    EXPECT_TRUE(allocate_matrix(test_matrix));
     for(size_t i = 0; i < num_rows; ++i){
-        test_matrix[i] = (int *)malloc(num_cols * sizeof(int));
         for(size_t j = 0; j < num_cols; ++j){
-            test_matrix[i][j] = input_matrix[i][j];
+            test_matrix->matrix[i][j] = input_matrix[i][j];
         }
     }
 
-    non_zero_matrix *result_struct = delete_zeros(test_matrix, num_rows, num_cols);
+    non_zero_matrix *result_struct = delete_zeros(test_matrix->matrix, test_matrix->num_rows, test_matrix->num_cols);
 
     EXPECT_EQ(NULL, result_struct);
 
-    for(size_t i = 0; i < num_rows; ++i){
-        free(test_matrix[i]);
-    }
-    free(test_matrix);
+    free_matrix(test_matrix);
 }
 
 TEST(test, NoZeroTest){
-    size_t num_rows = 4;
-    size_t num_cols = 4;
     int input_matrix[num_rows][num_cols] = {
             {1, 2, 4, 3},
-            {34, -5, 6, -6},
+            {34, -5, 6, -9},
             {23, 56, 12, 5},
-            {9, 7, 12, 45}
+            {-5, 36, 12, 45}
     };
     //Extra zeros won't be in result matrix
     int expected_input_matrix[num_rows][num_cols + 1] = {
             {1, 2, 4, 3, 0},
-            {34, -5, 6, -6, 0},
+            {34, -5, 6, -9, 0},
             {23, 56, 12, 5, 0},
-            {9, 7, 12, 45, 0}
+            {-5, 36, 12, 45, 0}
     };
-    int **test_matrix = (int **)malloc(num_rows * sizeof(int *));
+
+    matrix *test_matrix = (matrix *)malloc(sizeof(matrix));
+    EXPECT_TRUE(init_matrix(test_matrix, num_rows, num_cols));
+    EXPECT_TRUE(allocate_matrix(test_matrix));
     for(size_t i = 0; i < num_rows; ++i){
-        test_matrix[i] = (int *)malloc(num_cols * sizeof(int));
         for(size_t j = 0; j < num_cols; ++j){
-            test_matrix[i][j] = input_matrix[i][j];
+            test_matrix->matrix[i][j] = input_matrix[i][j];
         }
     }
+
     int **expected_matrix = (int **)malloc(num_rows * sizeof(int *));
     for(size_t i = 0; i < num_rows; ++i){
         expected_matrix[i] = (int *)malloc((num_cols + 1) * sizeof(int));
-        for(size_t j = 0; j < num_cols + 1; ++j){
-            expected_matrix[i][j] = expected_input_matrix[i][j];
+        for(size_t k = 0; k < num_cols + 1; ++k){
+            expected_matrix[i][k] = expected_input_matrix[i][k];
         }
     }
+
     non_zero_matrix *expected_struct = (non_zero_matrix *)malloc(sizeof(non_zero_matrix));
     expected_struct->matrix = expected_matrix;
     expected_struct->num_vectors = num_rows;
 
-    non_zero_matrix *result_struct = delete_zeros(test_matrix, num_rows, num_cols);
+    non_zero_matrix *result_struct = delete_zeros(test_matrix->matrix, test_matrix->num_rows, test_matrix->num_cols);
 
-    EXPECT_TRUE(is_equal(result_struct, expected_struct));
+    EXPECT_TRUE(is_equal(expected_struct, result_struct));
 
-    for(size_t i = 0; i < num_rows; ++i){
-        free(test_matrix[i]);
-    }
-    free(test_matrix);
     free_non_zero_matrix(expected_struct);
     free_non_zero_matrix(result_struct);
+    free_matrix(test_matrix);
 }
 
 TEST(test, ZeroRowTest){
-    size_t num_rows = 4;
-    size_t num_cols = 4;
     int input_matrix[num_rows][num_cols] = {
             {1, 2, 4, 3},
             {0, 0, 0, 0},
             {23, 56, 12, 5},
-            {9, 7, 12, 45}
+            {-5, 36, 12, 45}
     };
     //Extra zeros won't be in result matrix
     int expected_input_matrix[num_rows - 1][num_cols + 1] = {
             {1, 2, 4, 3, 0},
             {23, 56, 12, 5, 0},
-            {9, 7, 12, 45, 0}
+            {-5, 36, 12, 45, 0}
     };
-    int **test_matrix = (int **)malloc(num_rows * sizeof(int *));
+
+    matrix *test_matrix = (matrix *)malloc(sizeof(matrix));
+    EXPECT_TRUE(init_matrix(test_matrix, num_rows, num_cols));
+    EXPECT_TRUE(allocate_matrix(test_matrix));
     for(size_t i = 0; i < num_rows; ++i){
-        test_matrix[i] = (int *)malloc(num_cols * sizeof(int));
         for(size_t j = 0; j < num_cols; ++j){
-            test_matrix[i][j] = input_matrix[i][j];
+            test_matrix->matrix[i][j] = input_matrix[i][j];
         }
     }
-    int **expected_matrix = (int **)malloc(num_rows * sizeof(int *));
+
+    int **expected_matrix = (int **)malloc((num_rows - 1) * sizeof(int *));
     for(size_t i = 0; i < num_rows - 1; ++i){
         expected_matrix[i] = (int *)malloc((num_cols + 1) * sizeof(int));
-        for(size_t j = 0; j < num_cols + 1; ++j){
-            expected_matrix[i][j] = expected_input_matrix[i][j];
+        for(size_t k = 0; k < num_cols + 1; ++k){
+            expected_matrix[i][k] = expected_input_matrix[i][k];
         }
     }
+
     non_zero_matrix *expected_struct = (non_zero_matrix *)malloc(sizeof(non_zero_matrix));
     expected_struct->matrix = expected_matrix;
     expected_struct->num_vectors = num_rows - 1;
 
-    non_zero_matrix *result_struct = delete_zeros(test_matrix, num_rows, num_cols);
+    non_zero_matrix *result_struct = delete_zeros(test_matrix->matrix, test_matrix->num_rows, test_matrix->num_cols);
 
-    EXPECT_TRUE(is_equal(result_struct, expected_struct));
+    EXPECT_TRUE(is_equal(expected_struct, result_struct));
 
-    for(size_t i = 0; i < num_rows; ++i){
-        free(test_matrix[i]);
-    }
-    free(test_matrix);
     free_non_zero_matrix(expected_struct);
     free_non_zero_matrix(result_struct);
+    free_matrix(test_matrix);
 }
 
 TEST(test, ZeroColumnTest){
-    size_t num_rows = 4;
-    size_t num_cols = 4;
     int input_matrix[num_rows][num_cols] = {
-            {1, 0, 4, 3},
-            {34, 0, 6, -6},
-            {23, 0, 12, 5},
-            {9, 0, 12, 45}
+            {1, 2, 0, 3},
+            {34, -5, 0, -9},
+            {23, 56, 0, 5},
+            {-5, 36, 0, 45}
     };
     //Extra zeros won't be in result matrix
     int expected_input_matrix[num_rows][num_cols] = {
-            {1, 4, 3, 0},
-            {34, 6, -6, 0},
-            {23, 12, 5, 0},
-            {9, 12, 45, 0}
+            {1, 2, 3, 0},
+            {34, -5, -9, 0},
+            {23, 56, 5, 0},
+            {-5, 36, 45, 0}
     };
-    int **test_matrix = (int **)malloc(num_rows * sizeof(int *));
+
+    matrix *test_matrix = (matrix *)malloc(sizeof(matrix));
+    EXPECT_TRUE(init_matrix(test_matrix, num_rows, num_cols));
+    EXPECT_TRUE(allocate_matrix(test_matrix));
     for(size_t i = 0; i < num_rows; ++i){
-        test_matrix[i] = (int *)malloc(num_cols * sizeof(int));
         for(size_t j = 0; j < num_cols; ++j){
-            test_matrix[i][j] = input_matrix[i][j];
+            test_matrix->matrix[i][j] = input_matrix[i][j];
         }
     }
+
     int **expected_matrix = (int **)malloc(num_rows * sizeof(int *));
     for(size_t i = 0; i < num_rows; ++i){
         expected_matrix[i] = (int *)malloc((num_cols) * sizeof(int));
-        for(size_t j = 0; j < num_cols; ++j){
-            expected_matrix[i][j] = expected_input_matrix[i][j];
+        for(size_t k = 0; k < num_cols; ++k){
+            expected_matrix[i][k] = expected_input_matrix[i][k];
         }
     }
+
     non_zero_matrix *expected_struct = (non_zero_matrix *)malloc(sizeof(non_zero_matrix));
     expected_struct->matrix = expected_matrix;
     expected_struct->num_vectors = num_rows;
 
-    non_zero_matrix *result_struct = delete_zeros(test_matrix, num_rows, num_cols);
+    non_zero_matrix *result_struct = delete_zeros(test_matrix->matrix, test_matrix->num_rows, test_matrix->num_cols);
 
-    EXPECT_TRUE(is_equal(result_struct, expected_struct));
+    EXPECT_TRUE(is_equal(expected_struct, result_struct));
 
-    for(size_t i = 0; i < num_rows; ++i){
-        free(test_matrix[i]);
-    }
-    free(test_matrix);
     free_non_zero_matrix(expected_struct);
     free_non_zero_matrix(result_struct);
+    free_matrix(test_matrix);
 }
