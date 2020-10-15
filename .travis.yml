@@ -17,7 +17,7 @@ addons:
       - help2man
 
 script:
-  - cppcheck --check-config --error-exitcode=1 --enable=warning,performance,information,style src/*.c include/*.h test/*.cpp
+  - cppcheck --error-exitcode=1 --enable=warning,performance,information,style src/*.c include/*.h test/*.cpp
   - mkdir build
   - cd build
   - cmake ..
