@@ -16,7 +16,10 @@ char *input_string() {
         size_t capacity;
     } buf = {NULL, 0, 0};
     char c = '\0';
-    while (c = input_char(), c != EOF && c != '\n') {
+    while (c = input_char()) {
+        if(c == EOF || c == '\n'){
+            break;
+        }
         if (buf.size + 1 >= buf.capacity) {
             size_t new_capacity = !buf.capacity ? 1 : buf.capacity * 2;
             char *tmp = (char *)malloc((new_capacity + 1) * sizeof(char));
