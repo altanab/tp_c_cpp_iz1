@@ -51,6 +51,7 @@ void free_non_zero_matrix(non_zero_matrix *non_zero_m){
             free(non_zero_m->matrix[i]);
         }
         free(non_zero_m->matrix);
+        non_zero_m->matrix = NULL;
     }
     free(non_zero_m);
 }
@@ -78,10 +79,12 @@ non_zero_matrix *delete_zeros(int **input_matrix, size_t num_rows, size_t num_co
     if(input_matrix == NULL){
         return NULL;
     }
+
     non_zero_matrix *non_zero_m = init_non_zero_matrix(num_rows);
     if(non_zero_m == NULL){
         return NULL;
     }
+
     size_t num_non_zero_rows = 0;
     for(size_t i = 0; i < num_rows; ++i){
         int *non_zero_vector = (int *)calloc(num_cols + 1, sizeof(int));

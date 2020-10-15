@@ -8,6 +8,7 @@ extern "C" {
 const size_t num_rows = 4;
 const size_t num_cols = 4;
 
+//checks non_zero_matrix::is_equal function
 TEST(test, TestIsEqual){
     int input_matrix_1[num_rows][num_cols] = {
             {1, 2, 3, 0},
@@ -124,6 +125,7 @@ TEST(test, SimpleTest){
     free_matrix(test_matrix);
 }
 
+//checks if input matrix is NULL
 TEST(test, EmptyInputTest){
     int **test_matrix = NULL;
 
@@ -132,6 +134,7 @@ TEST(test, EmptyInputTest){
     EXPECT_EQ(NULL, result_struct);
 }
 
+//checks if input matrix consists only of zeros
 TEST(test, AllZeroTest){
     int input_matrix[num_rows][num_cols] = {
             {0, 0, 0, 0},
@@ -156,6 +159,7 @@ TEST(test, AllZeroTest){
     free_matrix(test_matrix);
 }
 
+//checks if input matrix doesn't have zeros
 TEST(test, NoZeroTest){
     int input_matrix[num_rows][num_cols] = {
             {1, 2, 4, 3},
@@ -201,6 +205,7 @@ TEST(test, NoZeroTest){
     free_matrix(test_matrix);
 }
 
+//checks if in input matrix row consists of only zeros
 TEST(test, ZeroRowTest){
     int input_matrix[num_rows][num_cols] = {
             {1, 2, 4, 3},
@@ -245,6 +250,7 @@ TEST(test, ZeroRowTest){
     free_matrix(test_matrix);
 }
 
+//checks if in input matrix column consists of only zeros
 TEST(test, ZeroColumnTest){
     int input_matrix[num_rows][num_cols] = {
             {1, 2, 0, 3},
