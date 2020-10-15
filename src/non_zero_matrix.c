@@ -12,7 +12,6 @@ non_zero_matrix *init_non_zero_matrix(size_t num_vectors){
     non_zero_m->matrix = NULL;
     non_zero_m->num_vectors = 0;
     if(!change_size_non_zero_matrix(non_zero_m, num_vectors)){
-        free(non_zero_m);
         return NULL;
     }
     for(size_t i = 0; i < num_vectors; ++i){
@@ -35,6 +34,7 @@ bool change_size_non_zero_matrix(non_zero_matrix *non_zero_m, size_t new_size){
     int **temp = (int **)realloc(non_zero_m->matrix, new_size * sizeof(int *));
     if(temp == NULL){
         printf("Cannot allocate memory\n");
+        free_non_zero_matrix(non_zero_m);
         return false;
     }
     non_zero_m->matrix = temp;
@@ -118,7 +118,6 @@ non_zero_matrix *delete_zeros(int **input_matrix, size_t num_rows, size_t num_co
         }
     }
     if(!change_size_non_zero_matrix(non_zero_m, num_non_zero_rows)){
-        free_non_zero_matrix(non_zero_m);
         return NULL;
     }
     if(num_non_zero_rows == 0){

@@ -1,9 +1,5 @@
 #ifndef IZ_1_MATRIX_H
 #define IZ_1_MATRIX_H
-#include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
-#include <stdlib.h>
 #include "input.h"
 
 typedef struct matrix{
